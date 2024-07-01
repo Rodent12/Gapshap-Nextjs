@@ -1,4 +1,4 @@
-# Realtime Chat with NextJs and Redis
+# Realtime ChatApp with NextJs,Pusher and Redis
 
 ### Tools use
 
