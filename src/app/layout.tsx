@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata = {
   title: "Home",
-  description: "Helo",
+  description: "Gapshap a realtime chatapp",
 };
 
 export default function RootLayout({
