@@ -1,4 +1,4 @@
-# Realtime Chat with NextJs and Redis
+# Realtime ChatApp with NextJs,Pusher and Redis
 
 ### Tools use
 
@@ -15,15 +15,6 @@
 - You can accept or reject friends
 - You can chat with your friends.
 
-### Credit
-
-This is a tutorial project by [joschan21](https://github.com/joschan21/nextjs-realtime-chat)
-
-<details>
-
- <summary>NextJs Porject Setup</summary>
-
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
 
