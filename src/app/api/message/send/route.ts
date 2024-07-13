@@ -9,17 +9,21 @@ import { toPusherKey } from "@/lib/utils";
 
 export async function POST(req: Request) {
   try {
+
     const { text, chatId }: { text: string; chatId: string } = await req.json();
     const session = await getServerSession(authOptions);
-    if (!session) return new Response("Unauthorized", { status: 401 });
 
+    if (!session) return new Response("Unauthorized", { status: 401 });
     const [userId1, userId2] = chatId.split("--");
+    
+    // if you are not either of the users using this chat you are unauthorized
     if (session.user.id !== userId1 && session.user.id !== userId2) {
       return new Response("Unauthorized", { status: 401 });
     }
 
+    // the person cannot send the message if he isn't a friend
     const friendId = session.user.id === userId1 ? userId2 : userId1;
-
+    
     const friendList = (await fetchRedis(
       "smembers",
       `user:${session.user.id}:friends`
@@ -29,6 +33,7 @@ export async function POST(req: Request) {
     if (!isFriend) {
       return new Response("Unauthorized", { status: 401 });
     }
+
     const rawSender = (await fetchRedis(
       "get",
       `user:${session.user.id}`
@@ -46,18 +51,18 @@ export async function POST(req: Request) {
     const message = messageValidator.parse(messageData);
 
     pusherServer.trigger(
-      toPusherKey(`chat:${chatId}`),
-      "incoming-message",
-      message
+      toPusherKey(`chat:${chatId}`),    // channel name
+      "incoming-message",               // event name
+      message                           // payload
     );
 
-    pusherServer.trigger(toPusherKey(`user:${friendId}:chats`), `new_message`, {
+    pusherServer.trigger(toPusherKey(`user:${friendId}:chats`), `new_message`, {     // this triggers the new_message event for the friend.
       ...message,
       senderImg: sender.image,
       senderName: sender.name,
     });
 
-    await db.zadd(`chat:${chatId}:messages`, {
+    await db.zadd(`chat:${chatId}:messages`, {      // updating in redis
       score: timestamp,
       member: JSON.stringify(message),
     });

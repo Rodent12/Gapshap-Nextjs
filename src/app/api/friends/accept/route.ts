@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     if (isAlreadyFriend) {
       return new Response("Already Friend", { status: 400 });
     }
-
+    // check if there is a friend request or not
     const hasFriendRequest = await fetchRedis(
       "sismember",
       `user:${session.user.id}:incoming_friend_requests`,
@@ -48,8 +48,8 @@ export async function POST(req: Request) {
     const user = JSON.parse(userRaw) as User;
     const friend = JSON.parse(friendRaw) as User;
 
-    await Promise.all([
-      pusherServer.trigger(
+    await Promise.all([                                                                   // here we trigger the new_friend event for both the user
+      pusherServer.trigger(                                                               // friend. Then we also upadte in redis for both of them.
         toPusherKey(`user:${idToAccept}:friends`),
         "new_friend",
         user
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
       ),
       db.sadd(`user:${session.user.id}:friends`, idToAccept),
       db.sadd(`user:${idToAccept}:friends`, session.user.id),
-      db.srem(`user:${session.user.id}:incoming_friend_requests`, idToAccept),
+      db.srem(`user:${session.user.id}:incoming_friend_requests`, idToAccept),            // this is to remove the friend request from the db.
     ]);
 
     return new Response("OK");
