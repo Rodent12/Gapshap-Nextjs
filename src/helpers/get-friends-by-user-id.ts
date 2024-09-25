@@ -16,6 +16,6 @@ export const getFriendsByUserId = async (userId: string) => {
       return parsedFriend
     })
   )
-
+  
   return friends
 }

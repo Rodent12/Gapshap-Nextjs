@@ -8,7 +8,7 @@ export default withAuth(
 
     const isAuth = await getToken({ req });
     const isLoginPage = pathname.startsWith("/login");
-    const sensitiveRoutes = ["/dashboard"];
+    const sensitiveRoutes = ["/dashboard"];     // the only sensitive route in this project
     const isAccessingSensitiveRoute = sensitiveRoutes.some((route) =>
       pathname.startsWith(route)
     );
@@ -18,15 +18,15 @@ export default withAuth(
         return NextResponse.redirect(new URL("/dashboard", req.url));
       }
       return NextResponse.next();
-    }
+    } // If someone goes to the login page then and they already have an alive token then they will be redirected to /dashboard
 
     if (!isAuth && isAccessingSensitiveRoute) {
       return NextResponse.redirect(new URL("/login", req.url));
-    }
+    } // Not authenticated
 
     if (pathname === "/") {
       return NextResponse.redirect(new URL("/dashboard", req.url));
-    }
+    } // Authenticated
   },
   {
     callbacks: {
