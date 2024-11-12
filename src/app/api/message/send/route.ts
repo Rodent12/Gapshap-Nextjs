@@ -56,11 +56,15 @@ export async function POST(req: Request) {
       message                           // payload
     );
 
-    pusherServer.trigger(toPusherKey(`user:${friendId}:chats`), `new_message`, {     // this triggers the new_message event for the friend.
-      ...message,
-      senderImg: sender.image,
-      senderName: sender.name,
-    });
+    pusherServer.trigger(               // this triggers the new_message event for the friend.
+      toPusherKey(`user:${friendId}:chats`),
+      `new_message`, 
+      { 
+        ...message,
+        senderImg: sender.image,
+        senderName: sender.name,
+      }
+    );
 
     await db.zadd(`chat:${chatId}:messages`, {      // updating in redis
       score: timestamp,

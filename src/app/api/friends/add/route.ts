@@ -11,7 +11,7 @@ export async function POST(req: Request) {
   try {
 
     const body = await req.json();
-    const { email: emailToAdd } = addFriendValidator.parse(body.email);  // this is a key value pair that's why it is read as such.
+    const { email: emailToAdd } = addFriendValidator.parse(body.email);  // this is a key value pair that's why it's read as such.
     const idToAdd = (await fetchRedis(
       "get",
       `user:email:${emailToAdd}`
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
       return new Response(`Unauthorized`, { status: 401 });
     }
 
-    // is the person sending freind request to himself
+    // is the person sending friend request to himself
     if (idToAdd == session.user.id) {
       return new Response("You cannot add yourself", { status: 400 });
     }
