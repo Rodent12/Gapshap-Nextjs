@@ -49,27 +49,29 @@ export async function POST(req: Request) {
     };
 
     const message = messageValidator.parse(messageData);
-
-    pusherServer.trigger(
-      toPusherKey(`chat:${chatId}`),    // channel name
-      "incoming-message",               // event name
-      message                           // payload
-    );
-
-    pusherServer.trigger(               // this triggers the new_message event for the friend.
-      toPusherKey(`user:${friendId}:chats`),
-      `new_message`, 
-      { 
-        ...message,
-        senderImg: sender.image,
-        senderName: sender.name,
-      }
-    );
-
-    await db.zadd(`chat:${chatId}:messages`, {      // updating in redis
+    
+    await db.zadd(`chat:${chatId}:messages`, {
       score: timestamp,
       member: JSON.stringify(message),
     });
+    
+    await Promise.all([
+      pusherServer.trigger(
+        toPusherKey(`chat:${chatId}`),
+        "incoming-message",
+        message
+      ),
+      pusherServer.trigger(
+        toPusherKey(`user:${friendId}:chats`),
+        `new_message`,
+        { 
+          ...message,
+          senderImg: sender.image,
+          senderName: sender.name,
+        }
+      ),
+    ]);
+    
 
     return new Response("OK");
   } catch (error) {
